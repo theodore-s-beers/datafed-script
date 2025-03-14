@@ -1,11 +1,32 @@
+import os
 from datafed.CommandLib import API
 
+# Ensure required environment variables are set
+required_env_vars = [
+    "DATAFED_PROJECT_ID",
+    "DATAFED_COLLECTION_ID",
+    "DATAFED_FILE_PATH",
+    "DATAFED_USERNAME",
+    "DATAFED_PASSWORD"
+]
+
+for var in required_env_vars:
+    if not os.getenv(var):
+        print(f"Error: Missing required environment variable: {var}")
+        exit(1)
+
+# Load environment variables
+PROJECT_ID = os.getenv("DATAFED_PROJECT_ID")
+COLLECTION_ID = os.getenv("DATAFED_COLLECTION_ID")  # Can be empty
+FILE_PATH = os.getenv("DATAFED_FILE_PATH")
+USERNAME = os.getenv("DATAFED_USERNAME")
+PASSWORD = os.getenv("DATAFED_PASSWORD")
 # Initialize API client
 api = API()
 
 # Step 1: Authenticate (Assumes DataFed is already configured with authentication)
 try:
-    api.loginByPassword("username", "password")
+    api.loginByPassword(USERNAME, PASSWORD)
     print("Successfully logged into DataFed.")
 except Exception as e:
     print(f"Login failed: {e}")
