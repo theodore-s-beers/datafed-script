@@ -23,6 +23,25 @@ class ProjectListMessage:
     total: int
 
 
+@dataclass
+class RecordData:
+    id: str
+    title: str
+    repo_id: str
+    size: int
+    ext_auto: bool
+    ct: int
+    ut: int
+    owner: str  # i.e., project ID
+    creator: str  # i.e., user ID
+    parent_id: str  # i.e., collection ID
+
+
+@dataclass
+class DataCreateMessage:
+    data: list[RecordData]
+
+
 # Load environment variables
 load_dotenv()
 USERNAME = os.getenv("DATAFED_USERNAME")
@@ -86,7 +105,7 @@ slide_ids: dict[str, Optional[str]] = {
 }
 
 
-# Step 3: Create a new data record under the selected project
+# Step 3: Create new data records
 try:
     for id in slide_ids.keys():
         zip_path = f"data/{id}/{id}.zip"
@@ -98,18 +117,28 @@ try:
             raise ValueError(f"File '{json_path}' not found")
 
         response = api.dataCreate(title=id, metadata_file=json_path)
-        response_message = response[0]
-        print(response_message)
+        response_message = cast(DataCreateMessage, response[0])
+
+        record_data = response_message.data
+        assert len(record_data) == 1
+
+        record_id = response_message.data[0].id
+        slide_ids[id] = record_id
+        print(f"Data record created with ID {record_id}")
 except Exception as e:
-    print(f"Error creating data record: {e}")
+    print(f"Error creating data record: {e}", file=sys.stderr)
     exit(1)
 
 
-# # Step 6: Attach a predefined file to the data record
-# file_path = "/path/to/your/file.txt"  # Change this to the actual file path
+# Step 4: Attach files to data records
+try:
+    for slide, record in slide_ids.items():
+        if record is None:
+            raise ValueError(f"No record ID found for slide {slide}")
 
-# try:
-#     api.dataPut(record_id, file_path)
-#     print(f"File '{file_path}' successfully attached to record {record_id}")
-# except Exception as e:
-#     print(f"Error attaching file: {e}")
+        zip_path = f"data/{slide}/{slide}.zip"
+        api.dataPut(record, zip_path)
+        print(f"File '{zip_path}' successfully attached to record {record}")
+except Exception as e:
+    print(f"Error attaching file: {e}", file=sys.stderr)
+    exit(1)
