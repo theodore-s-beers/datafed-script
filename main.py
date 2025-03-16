@@ -50,18 +50,20 @@ class DataCreateMessage:
 # Constants
 #
 
-slides_to_records: dict[str, Optional[str]] = {
-    "GC101777A_40x_BF_19z": None,
-    "GC101778A_40x_BF_18z": None,
-    "GC101780A_40x_BF_15z": None,
-    "GC101781A_40x_BF_15z": None,
-    "GC101783A_40x_BF_17z": None,
-    "GC101784A_40x_BF_15z": None,
-    "GC101786A_40x_BF_18z": None,
-    "GC101787A_40x_BF_21z": None,
-    "GC101789A_40x_BF_25z": None,
-    "GC101790A_40x_BF_18z": None,
-}
+slides = [
+    "GC101777A_40x_BF_19z",
+    "GC101778A_40x_BF_18z",
+    "GC101780A_40x_BF_15z",
+    "GC101781A_40x_BF_15z",
+    "GC101783A_40x_BF_17z",
+    "GC101784A_40x_BF_15z",
+    "GC101786A_40x_BF_18z",
+    "GC101787A_40x_BF_21z",
+    "GC101789A_40x_BF_25z",
+    "GC101790A_40x_BF_18z",
+]
+
+slides_mapping: dict[str, Optional[str]] = {slide: None for slide in slides}
 
 #
 # Environment variables
@@ -117,7 +119,7 @@ except Exception as e:
 
 # Step 3: Create new data records
 try:
-    for slide in slides_to_records.keys():
+    for slide in slides_mapping.keys():
         zip_path = f"data/{slide}/{slide}.zip"
         if not os.path.exists(zip_path):
             raise ValueError(f"File '{zip_path}' not found")
@@ -133,7 +135,7 @@ try:
         assert len(record_data) == 1
 
         record_id = data_create_message.data[0].id
-        slides_to_records[slide] = record_id
+        slides_mapping[slide] = record_id
         print(f"Data record created with ID {record_id}")
 except Exception as e:
     print(f"Error creating data record: {e}", file=sys.stderr)
@@ -141,7 +143,7 @@ except Exception as e:
 
 # Step 4: Attach files to data records
 try:
-    for slide, record in slides_to_records.items():
+    for slide, record in slides_mapping.items():
         if record is None:
             raise ValueError(f"No record ID found for slide {slide}")
 
