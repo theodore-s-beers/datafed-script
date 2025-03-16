@@ -136,8 +136,12 @@ try:
         if record is None:
             raise ValueError(f"No record ID found for slide {slide}")
 
+        print(f"Attaching file {slide}.zip to record {record}")
         zip_path = f"data/{slide}/{slide}.zip"
-        api.dataPut(record, zip_path)
+        if not os.path.exists(zip_path):
+            raise ValueError(f"File '{zip_path}' not found")
+
+        api.dataPut(data_id=record, path=zip_path, wait=True)
         print(f"File '{zip_path}' successfully attached to record {record}")
 except Exception as e:
     print(f"Error attaching file: {e}", file=sys.stderr)
