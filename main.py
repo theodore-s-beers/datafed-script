@@ -50,7 +50,7 @@ class DataCreateMessage:
 # Constants
 #
 
-slide_ids: dict[str, Optional[str]] = {
+slides_to_records: dict[str, Optional[str]] = {
     "GC101777A_40x_BF_19z": None,
     "GC101778A_40x_BF_18z": None,
     "GC101780A_40x_BF_15z": None,
@@ -89,51 +89,51 @@ for k, v in required_env_vars.items():
 #
 
 # Initialize API client
-api = API()
+df_api = API()
 
 # Step 1: Authenticate
 try:
-    api.loginByPassword(USERNAME, PASSWORD)
+    df_api.loginByPassword(USERNAME, PASSWORD)
     print("Successfully logged into DataFed")
 except Exception as e:
-    print(f"Login failed: {e}")
+    print(f"Login failed: {e}", file=sys.stderr)
     exit(1)
 
 # Step 2: Validate project ID and set context
 try:
-    project_list_response = api.projectList()
+    project_list_response = df_api.projectList()
     project_list_message = cast(ProjectListMessage, project_list_response[0])
     project_ids = [item.id for item in project_list_message.item]
 
     if PROJECT_ID not in project_ids:
         raise ValueError(f"Project {PROJECT_ID} not found")
-    print(f"Project {PROJECT_ID} found")
 
-    api.setContext(PROJECT_ID)
-    print("Context set")
+    print(f"Project {PROJECT_ID} found")
+    df_api.setContext(PROJECT_ID)
+    print("Project context set")
 except Exception as e:
     print(f"Error selecting project: {e}", file=sys.stderr)
     exit(1)
 
 # Step 3: Create new data records
 try:
-    for id in slide_ids.keys():
-        zip_path = f"data/{id}/{id}.zip"
+    for slide in slides_to_records.keys():
+        zip_path = f"data/{slide}/{slide}.zip"
         if not os.path.exists(zip_path):
             raise ValueError(f"File '{zip_path}' not found")
 
-        json_path = f"data/{id}/{id}.json"
+        json_path = f"data/{slide}/{slide}.json"
         if not os.path.exists(json_path):
             raise ValueError(f"File '{json_path}' not found")
 
-        response = api.dataCreate(title=id, metadata_file=json_path)
-        response_message = cast(DataCreateMessage, response[0])
+        data_create_response = df_api.dataCreate(title=slide, metadata_file=json_path)
+        data_create_message = cast(DataCreateMessage, data_create_response[0])
 
-        record_data = response_message.data
+        record_data = data_create_message.data
         assert len(record_data) == 1
 
-        record_id = response_message.data[0].id
-        slide_ids[id] = record_id
+        record_id = data_create_message.data[0].id
+        slides_to_records[slide] = record_id
         print(f"Data record created with ID {record_id}")
 except Exception as e:
     print(f"Error creating data record: {e}", file=sys.stderr)
@@ -141,7 +141,7 @@ except Exception as e:
 
 # Step 4: Attach files to data records
 try:
-    for slide, record in slide_ids.items():
+    for slide, record in slides_to_records.items():
         if record is None:
             raise ValueError(f"No record ID found for slide {slide}")
 
@@ -150,7 +150,7 @@ try:
         if not os.path.exists(zip_path):
             raise ValueError(f"File '{zip_path}' not found")
 
-        api.dataPut(data_id=record, path=zip_path, wait=True)
+        df_api.dataPut(data_id=record, path=zip_path, wait=True)
         print(f"File '{zip_path}' successfully attached to record {record}")
 except Exception as e:
     print(f"Error attaching file: {e}", file=sys.stderr)
