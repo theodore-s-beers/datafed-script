@@ -6,6 +6,10 @@ from typing import Optional, cast
 from datafed.CommandLib import API  # type: ignore
 from dotenv import load_dotenv
 
+#
+# Types
+#
+
 
 @dataclass
 class ProjectItem:
@@ -42,12 +46,32 @@ class DataCreateMessage:
     data: list[RecordData]
 
 
+#
+# Constants
+#
+
+slide_ids: dict[str, Optional[str]] = {
+    "GC101777A_40x_BF_19z": None,
+    "GC101778A_40x_BF_18z": None,
+    "GC101780A_40x_BF_15z": None,
+    "GC101781A_40x_BF_15z": None,
+    "GC101783A_40x_BF_17z": None,
+    "GC101784A_40x_BF_15z": None,
+    "GC101786A_40x_BF_18z": None,
+    "GC101787A_40x_BF_21z": None,
+    "GC101789A_40x_BF_25z": None,
+    "GC101790A_40x_BF_18z": None,
+}
+
+#
+# Environment variables
+#
+
 # Load environment variables
 load_dotenv()
 USERNAME = os.getenv("DATAFED_USERNAME")
 PASSWORD = os.getenv("DATAFED_PASSWORD")
 PROJECT_ID = os.getenv("DATAFED_PROJECT_ID")
-
 
 # Ensure environment variables are non-null
 required_env_vars = {
@@ -60,10 +84,12 @@ for k, v in required_env_vars.items():
         print(f"Error: Missing environment variable {k}", file=sys.stderr)
         exit(1)
 
+#
+# Main
+#
 
 # Initialize API client
 api = API()
-
 
 # Step 1: Authenticate
 try:
@@ -72,7 +98,6 @@ try:
 except Exception as e:
     print(f"Login failed: {e}")
     exit(1)
-
 
 # Step 2: Validate project ID and set context
 try:
@@ -89,21 +114,6 @@ try:
 except Exception as e:
     print(f"Error selecting project: {e}", file=sys.stderr)
     exit(1)
-
-
-slide_ids: dict[str, Optional[str]] = {
-    "GC101777A_40x_BF_19z": None,
-    "GC101778A_40x_BF_18z": None,
-    "GC101780A_40x_BF_15z": None,
-    "GC101781A_40x_BF_15z": None,
-    "GC101783A_40x_BF_17z": None,
-    "GC101784A_40x_BF_15z": None,
-    "GC101786A_40x_BF_18z": None,
-    "GC101787A_40x_BF_21z": None,
-    "GC101789A_40x_BF_25z": None,
-    "GC101790A_40x_BF_18z": None,
-}
-
 
 # Step 3: Create new data records
 try:
@@ -128,7 +138,6 @@ try:
 except Exception as e:
     print(f"Error creating data record: {e}", file=sys.stderr)
     exit(1)
-
 
 # Step 4: Attach files to data records
 try:
