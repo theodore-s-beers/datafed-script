@@ -3,7 +3,7 @@ name = "datafed-script"
 version = "0.1.0"
 description = "TBD"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
   "datafed>=3.0.3",
   "mypy>=1.15.0",
