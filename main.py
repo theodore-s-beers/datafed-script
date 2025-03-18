@@ -74,12 +74,14 @@ load_dotenv()
 USERNAME = os.getenv("DATAFED_USERNAME")
 PASSWORD = os.getenv("DATAFED_PASSWORD")
 PROJECT_ID = os.getenv("DATAFED_PROJECT_ID")
+ENDPOINT_ID = os.getenv("GLOBUS_ENDPOINT_ID")
 
 # Ensure environment variables are non-null
 required_env_vars = {
     "DATAFED_USERNAME": USERNAME,
     "DATAFED_PASSWORD": PASSWORD,
     "DATAFED_PROJECT_ID": PROJECT_ID,
+    "GLOBUS_ENDPOINT_ID": ENDPOINT_ID,
 }
 for k, v in required_env_vars.items():
     if not v:
@@ -113,6 +115,9 @@ try:
     print(f"Project {PROJECT_ID} found")
     df_api.setContext(PROJECT_ID)
     print("Project context set")
+
+    df_api.endpointSet(ENDPOINT_ID)
+    print(f"Globus endpoint set to {ENDPOINT_ID}")
 except Exception as e:
     print(f"Error selecting project: {e}", file=sys.stderr)
     exit(1)
@@ -120,11 +125,11 @@ except Exception as e:
 # Step 3: Create new data records
 try:
     for slide in slides_mapping.keys():
-        zip_path = f"data/{slide}/{slide}.zip"
+        zip_path = f"/var/gcp/data/{slide}/{slide}.zip"
         if not os.path.exists(zip_path):
             raise ValueError(f"File '{zip_path}' not found")
 
-        json_path = f"data/{slide}/{slide}.json"
+        json_path = f"/var/gcp/data/{slide}/{slide}.json"
         if not os.path.exists(json_path):
             raise ValueError(f"File '{json_path}' not found")
 
@@ -148,7 +153,7 @@ try:
             raise ValueError(f"No record ID found for slide {slide}")
 
         print(f"Attaching file {slide}.zip to record {record}")
-        zip_path = f"data/{slide}/{slide}.zip"
+        zip_path = f"/var/gcp/data/{slide}/{slide}.zip"
         if not os.path.exists(zip_path):
             raise ValueError(f"File '{zip_path}' not found")
 
