@@ -51,7 +51,7 @@ class DataCreateMessage:
 #
 
 slides = [
-    "GC101777A_40x_BF_19z",
+    # "GC101777A_40x_BF_19z",  # Done
     "GC101778A_40x_BF_18z",
     "GC101780A_40x_BF_15z",
     "GC101781A_40x_BF_15z",
@@ -157,8 +157,8 @@ try:
         if not os.path.exists(zip_path):
             raise ValueError(f"File '{zip_path}' not found")
 
-        df_api.dataPut(data_id=record, path=zip_path, wait=True)
-        print(f"File '{zip_path}' successfully attached to record {record}")
+        data_put_response = df_api.dataPut(data_id=record, path=zip_path, wait=True)
+        print(data_put_response[0])  # Will try to type this later
 except Exception as e:
     print(f"Error attaching file: {e}", file=sys.stderr)
     exit(1)
