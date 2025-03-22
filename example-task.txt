@@ -1,0 +1,14 @@
+# Attaching file GC101778A_40x_BF_18z.zip to record d/525662565
+task {
+  id: "task/525802027"
+  type: TT_DATA_PUT
+  status: TS_SUCCEEDED
+  client: "u/tsb"
+  step: 3
+  steps: 4
+  msg: "Finished"
+  ct: 1742431173
+  ut: 1742431960
+  source: "ce6c1dab-0413-11f0-b29a-0e5b56670d2d/var/gcp/data/GC101778A_40x_BF_18z/GC101778A_40x_BF_18z.zip"
+  dest: "d/525662565"
+}
