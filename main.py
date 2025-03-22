@@ -46,21 +46,57 @@ class DataCreateMessage:
     data: list[RecordData]
 
 
+@dataclass
+class DataPutTask:
+    id: str
+    type: str
+    status: str
+    client: str
+    step: int
+    steps: int
+    msg: str
+    ct: int
+    ut: int
+    source: str
+    dest: str
+
+
+@dataclass
+class DataPutMessage:
+    task: list[DataPutTask]
+
+
 #
 # Constants
 #
 
-slides = [
-    # "GC101777A_40x_BF_19z",  # Done
-    "GC101778A_40x_BF_18z",
-    "GC101780A_40x_BF_15z",
-    "GC101781A_40x_BF_15z",
-    "GC101783A_40x_BF_17z",
-    "GC101784A_40x_BF_15z",
-    "GC101786A_40x_BF_18z",
-    "GC101787A_40x_BF_21z",
-    "GC101789A_40x_BF_25z",
-    "GC101790A_40x_BF_18z",
+slides: list[str] = [
+    "GC101765A_40x_BF_22z",
+    "GC101767A_40x_BF_27z",
+    "GC101772A_40x_BF_15z",
+    "GC101775A_40x_BF_18z",
+    # "GC101777A_40x_BF_19z",  # This block uploaded already
+    # "GC101778A_40x_BF_18z",
+    # "GC101780A_40x_BF_15z",
+    # "GC101781A_40x_BF_15z",
+    # "GC101783A_40x_BF_17z",
+    # "GC101784A_40x_BF_15z",
+    # "GC101786A_40x_BF_18z",
+    # "GC101787A_40x_BF_21z",
+    # "GC101789A_40x_BF_25z",
+    # "GC101790A_40x_BF_18z",
+    "GC101792A_40x_BF_21z",
+    "GC101793A_40x_BF_22z",
+    "GC101795A_40x_BF_20z",
+    "GC101796A_40x_BF_17z",
+    "GC101799A_40x_BF_19z",
+    "GC101801A_40x_BF_21z",
+    "GC101802A_40x_BF_17z",
+    "GC101803A_40x_BF_17z",
+    "GC101804B_40x_BF_18z",
+    "GC101805A_40x_BF_13z",
+    "GC101806A_40x_BF_24z",
+    "GC101807A_40x_BF_27z",
 ]
 
 slides_mapping: dict[str, Optional[str]] = {slide: None for slide in slides}
@@ -158,7 +194,10 @@ try:
             raise ValueError(f"File '{zip_path}' not found")
 
         data_put_response = df_api.dataPut(data_id=record, path=zip_path, wait=True)
-        print(data_put_response[0])  # Will try to type this later
+        data_put_message = cast(DataPutMessage, data_put_response[0])
+        data_put_tasks = data_put_message.task
+        assert len(data_put_tasks) == 1
+        assert data_put_tasks[0].msg == "Finished"
 except Exception as e:
     print(f"Error attaching file: {e}", file=sys.stderr)
     exit(1)
