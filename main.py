@@ -196,8 +196,10 @@ try:
         data_put_response = df_api.dataPut(data_id=record, path=zip_path, wait=True)
         data_put_message = cast(DataPutMessage, data_put_response[0])
         data_put_tasks = data_put_message.task
+
         assert len(data_put_tasks) == 1
         assert data_put_tasks[0].msg == "Finished"
+        print(f"File transfer {data_put_tasks[0].id} complete")
 except Exception as e:
     print(f"Error attaching file: {e}", file=sys.stderr)
     exit(1)
